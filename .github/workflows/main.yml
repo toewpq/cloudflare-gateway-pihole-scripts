@@ -39,7 +39,7 @@ jobs:
       - name: Download blocklists
         run: npm run download:blocklist
         env:
-          BLOCKLIST_URLS: ${{ vars.BLOCKLIST_URLS }}
+          BLOCKLIST_URLS: https://raw.githubusercontent.com/hagezi/dns-blocklists/main/adblock/pro.mini.txt  # 设置黑名单 URL
 
       - name: Delete old rules and lists
         run: npm run cloudflare-delete
