@@ -1,111 +1,109 @@
-# Cloudflare Gateway Pi-hole Scripts (CGPS)
-
+# Cloudflare 网关 Pi-hole 脚本 (CGPS)
 ![Cloudflare Gateway Analytics screenshot showing a thousand blocked DNS requests](.github/images/gateway_analytics.png)
 
 Cloudflare Gateway allows you to create custom rules to filter HTTP, DNS, and network traffic based on your firewall policies. This is a collection of scripts that can be used to get a similar experience as if you were using Pi-hole, but with Cloudflare Gateway - so no servers to maintain or need to buy a Raspberry Pi!
 
-## About the individual scripts
+## 关于各个脚本
 
-- `cf_list_delete.js` - Deletes all lists created by CGPS from Cloudflare Gateway. This is useful for subsequent runs.
-- `cf_list_create.js` - Takes a blocklist.txt file containing domains and creates lists in Cloudflare Gateway
-- `cf_gateway_rule_create.js` - Creates a Cloudflare Gateway rule to block all traffic if it matches the lists created by CGPS.
-- `cf_gateway_rule_delete.js` - Deletes the Cloudflare Gateway rule created by CGPS. Useful for subsequent runs.
-- `download_lists.js` - Initiates blocklist and whitelist download.
+- `cf_list_delete.js` - 从 Cloudflare Gateway 删除 CGPS 创建的所有列表。这对于后续运行很有用。
+- `cf_list_create.js` - 获取包含域的 blocklist.txt 文件并在 Cloudflare Gateway 中创建列表
+- `cf_gateway_rule_create.js` - 创建一个 Cloudflare Gateway 规则，以阻止所有流量（如果它与 CGPS 创建的列表匹配）。
+- `cf_gateway_rule_delete.js` - 删除 CGPS 创建的 Cloudflare Gateway 规则。对于后续运行很有用。
+- `download_lists.js` - 启动阻止列表和白名单下载。
 
-## Features
+＃＃ 特征
 
-- Support for basic hosts files
-- Full support for domain lists
-- Automatically cleans up filter lists: removes duplicates, invalid domains, comments and more
-- Works **fully unattended**
-- **Allowlist support**, allowing you to prevent false positives and breakage by forcing trusted domains to always be unblocked.
-- Experimental **SNI-based filtering** that works independently of DNS settings, preventing unauthorized or malicious DNS changes from bypassing the filter.
-- Optional health check: Sends a ping request ensuring continuous monitoring and alerting for the workflow execution, or messages a Discord webhook with progress.
+- 支持基本主机文件
+- 完全支持域列表
+- 自动清理过滤器列表：删除重复项、无效域、评论等
+- 工作**完全无人值守**
+- **白名单支持**，允许您通过强制受信任的域始终处于解锁状态来防止误报和破坏。
+- 实验性**基于 SNI 的过滤**，独立于 DNS 设置运行，防止未经授权或恶意的 DNS 更改绕过过滤器。
+- 可选的运行状况检查：发送 ping 请求，确保对工作流程执行进行持续监控和警报，或向 Discord Webhook 发送进度消息。
 
-## Usage
+＃＃ 用法
 
-### Prerequisites
+### 先决条件
 
-1. Node.js installed on your machine
-2. Cloudflare [Zero Trust](https://one.dash.cloudflare.com/) account - the Free plan is enough. Use the Cloudflare [documentation](https://developers.cloudflare.com/cloudflare-one/) for details.
-3. Cloudflare email, API **token** with Zero Trust read and edit permissions, and account ID. See [here](https://github.com/mrrfv/cloudflare-gateway-pihole-scripts/blob/main/extended_guide.md#cloudflare_api_token) for more information about how to create the token.
-4. A file containing the domains you want to block - **max 300,000 domains for the free plan** - in the working directory named `blocklist.txt`. Mullvad provides awesome [DNS blocklists](https://github.com/mullvad/dns-blocklists) that work well with this project. A script that downloads recommended blocklists, `download_lists.js`, is included.
-5. Optional: You can whitelist domains by putting them in a file `allowlist.txt`. You can also use the `get_recomended_whitelist.sh` Bash script to get the recommended whitelists.
-6. Optional: A Discord (or similar) webhook URL to send notifications to.
+1. 在你的机器上安装 Node.js
+2. Cloudflare [零信任](https://one.dash.cloudflare.com/) 帐户 - 免费计划就足够了。使用 Cloudflare [文档](https://developers.cloudflare.com/cloudflare-one/) 来了解详细信息。
+3. Cloudflare 电子邮件、具有零信任读取和编辑权限的 **API令牌**，以及帐户 ID。有关如何创建令牌的更多信息，请参阅[此处](https://github.com/mrrfv/cloudflare-gateway-pihole-scripts/blob/main/extended_guide.md#cloudflare_api_token)。
+4. 包含您要阻止的域的文件 - **免费计划最多 300000 个域** - 位于名为“blocklist.txt”的工作目录中。 Mulvad 提供了很棒的 [DNS 阻止列表](https://github.com/mulvad/dns-blocklists)，非常适合这个项目。其中包含下载推荐阻止列表的脚本“download_lists.js”。
+5. 可选：您可以通过将域名放入“allowlist.txt”文件中将其列入白名单。您还可以使用“get_recomend_whitelist.sh”Bash 脚本来获取推荐的白名单。
+6. 可选：用于发送通知的 Discord（或类似）Webhook URL。
 
-### Running locally
+### 本地运行
 
-1. Clone this repository.
-2. Run `npm install` to install dependencies.
-3. Copy `.env.example` to `.env` and fill in the values.
-4. If this is a subsequent run, execute `node cf_gateway_rule_delete.js` and `node cf_list_delete.js` (in order) to delete old data.
-5. If you haven't downloaded any filters yourself, run the `node download_lists.js` command to download recommended filter lists (about 50 000 domains).
-6. Run `node cf_list_create.js` to create the lists in Cloudflare Gateway. This will take a while.
-7. Run `node cf_gateway_rule_create.js` to create the firewall rule in Cloudflare Gateway.
-8. Profit!
+1. 克隆此存储库。
+2. 运行`npm install`来安装依赖项。
+3. 将 `.env.example` 复制到 `.env` 并填写值。
+4. 如果这是后续运行，请按顺序执行“node cf_gateway_rule_delete.js”和“node cf_list_delete.js”以删除旧数据。
+5. 如果您自己没有下载任何过滤器，请运行“node download_lists.js”命令下载推荐的过滤器列表（约 50 000 个域）。
+6. 运行 `node cf_list_create.js` 在 Cloudflare Gateway 中创建列表。这需要一段时间。
+7. 运行 `node cf_gateway_rule_create.js` 在 Cloudflare Gateway 中创建防火墙规则。
+8. 祝贺你成功运行
+### 在 GitHub Actions 中运行
 
-### Running in GitHub Actions
+这些脚本可以使用 GitHub Actions 运行，因此您的过滤器将自动更新并推送到 Cloudflare Gateway。如果您使用经常更新的恶意软件阻止列表，这非常有用。
 
-These scripts can be run using GitHub Actions so your filters will be automatically updated and pushed to Cloudflare Gateway. This is useful if you are using a frequently updated malware blocklist.
+请注意，GitHub Action 默认下载推荐的阻止列表和白名单。您可以通过设置操作变量来更改此行为。
 
-Please note that the GitHub Action downloads the recommended blocklists and whitelist by default. You can change this behavior by setting Actions variables.
+1. 创建一个新的空的私有存储库。不鼓励分叉或公共存储库，但支持 - 尽管脚本永远不会泄漏您的 API 密钥，并且 GitHub Actions 秘密会自动从日志中编辑，但安全总比后悔好。如果您这样做，**无需使用“同步分叉”按钮**！无论您的分叉存储库中有什么内容，GitHub Action 都会下载最新的代码。
+2. 在存储库设置中创建以下 GitHub Actions 密钥：
+   - `CLOUDFLARE_API_TOKEN`：您的具有零信任读取和编辑权限的 Cloudflare API 令牌
+   - `CLOUDFLARE_ACCOUNT_ID`：您的 Cloudflare 帐户 ID
+   - `CLOUDFLARE_LIST_ITEM_LIMIT`：Cloudflare 零信任计划允许的阻止域的最大数量。默认为 300,000。如果您使用免费计划，则可选。
+   - `PING_URL`：/可选/ GitHub Action 成功更新过滤器后用于 ping 的 HTTP(S) URL（使用curl）。对于查看状态很有用。
+   - `DISCORD_WEBHOOK_URL`：/可选/要发送通知的 Discord（或类似）Webhook URL。
+3. 如果需要，请在存储库设置中创建以下 GitHub Actions 变量：
+   - `ALLOWLIST_URLS`：使用您自己的白名单。每行一个 URL。如果未提供此变量，将使用推荐的允许列表。
+   - `BLOCKLIST_URLS`：使用您自己的阻止列表。每行一个 URL。如果未提供此变量，将使用推荐的阻止列表。
+   - `BLOCK_PAGE_ENABLED`：如果主机被阻止，则启用显示阻止页面。
+4. 在存储库中创建一个名为“.github/workflows/main.yml”的新文件，其中包含在此存储库中找到的“auto_update_github_action.yml”的内容。默认设置将在每周凌晨 3 点（世界标准时间）更新您的过滤器。您可以通过编辑“schedule”属性来更改此设置。
+5. 在存储库设置中启用 GitHub Actions。
 
-1. Create a new empty, private repository. Forking or public repositories are discouraged, but supported - although the script never leaks your API keys and GitHub Actions secrets are automatically redacted from the logs, it's better to be safe than sorry. There is **no need to use the "Sync fork" button** if you're doing that! The GitHub Action downloads the latest code regardless of what's in your forked repository.
-2. Create the following GitHub Actions secrets in your repository settings:
-   - `CLOUDFLARE_API_TOKEN`: Your Cloudflare API Token with Zero Trust read and edit permissions
-   - `CLOUDFLARE_ACCOUNT_ID`: Your Cloudflare account ID
-   - `CLOUDFLARE_LIST_ITEM_LIMIT`: The maximum number of blocked domains allowed for your Cloudflare Zero Trust plan. Default to 300,000. Optional if you are using the free plan.
-   - `PING_URL`: /Optional/ The HTTP(S) URL to ping (using curl) after the GitHub Action has successfully updated your filters. Useful for monitoring.
-   - `DISCORD_WEBHOOK_URL`: /Optional/ The Discord (or similar) webhook URL to send notifications to. Good for monitoring as well.
-3. Create the following GitHub Actions variables in your repository settings if you desire:
-   - `ALLOWLIST_URLS`: Uses your own allowlists. One URL per line. Recommended allowlists will be used if this variable is not provided.
-   - `BLOCKLIST_URLS`: Uses your own blocklists. One URL per line. Recommended blocklists will be used if this variable is not provided.
-   - `BLOCK_PAGE_ENABLED`: Enable showing block page if host is blocked.
-4. Create a new file in the repository named `.github/workflows/main.yml` with the contents of `auto_update_github_action.yml` found in this repository. The default settings will update your filters every week at 3 AM UTC. You can change this by editing the `schedule` property.
-5. Enable GitHub Actions in your repository settings.
+### Cloudflare 网关的 DNS 设置
 
-### DNS setup for Cloudflare Gateway
+1. 转到 Cloudflare 零信任仪表板，然后导航到网关 -> DNS 位置。
+2. 单击默认位置，如果不存在则创建一个。
+3. 根据提供的 DNS 地址配置您的路由器或设备。
 
-1. Go to your Cloudflare Zero Trust dashboard, and navigate to Gateway -> DNS Locations.
-2. Click on the default location or create one if it doesn't exist.
-3. Configure your router or device based on the provided DNS addresses.
+或者，您可以安装 Cloudflare WARP 客户端并登录零信任。此方法通过 Cloudflare 服务器代理您的流量，这意味着它的工作原理与商业 VPN 类似。如果您想使用基于 SNI 的过滤功能，则需要执行此操作，因为它需要 Cloudflare 检查您的原始流量（如果禁用“TLS 解密”，HTTPS 仍保持加密状态）。
 
-Alternatively, you can install the Cloudflare WARP client and log in to Zero Trust. This method proxies your traffic over Cloudflare servers, meaning it works similarly to a commercial VPN. You need to do this if you want to use the SNI-based filtering feature, as it requires Cloudflare to inspect your raw traffic (HTTPS remains encrypted if "TLS decryption" is disabled).
+### 恶意软件拦截
 
-### Malware blocking
+默认过滤器列表仅针对广告和跟踪器拦截进行了优化，因为 Cloudflare 零信任本身配备了更高级的安全功能。建议您创建自己的 Cloudflare Gateway 防火墙策略，以利用 CGPS 之上的这些功能。
 
-The default filter lists are only optimized for ad & tracker blocking because Cloudflare Zero Trust itself comes with much more advanced security features. It's recommended that you create your own Cloudflare Gateway firewall policies that leverage those features on top of CGPS.
+### 试运行
 
-### Dry runs
+看看是否例如您的过滤器列表是有效的，无需实际更改 Cloudflare 帐户中的任何内容，您可以以“.env”或常规方式将“DRY_RUN”环境变量设置为 1。这只会将信息（例如将创建的列表或重复域的数量）打印到控制台。
 
-To see if e.g. your filter lists are valid without actually changing anything in your Cloudflare account, you can set the `DRY_RUN` environment variable to 1, either in `.env` or the regular way. This will only print info such as the lists that would be created or the amount of duplicate domains to the console.
-
-**Warning:** This currently only works for `cf_list_create.js`.
+**警告：** 目前仅适用于“cf_list_create.js”。
 
 <!-- markdownlint-disable-next-line MD026 -->
-## Why not...
+##为什么不...
 
-### Pi-hole or Adguard Home?
+### Pi-hole 还是 Adguard Home？
 
-- Complex setup to get it working outside your home
-- Requires a Raspberry Pi
+- 复杂的设置让它在你的家外工作
+- 需要树莓派
 
-### NextDNS?
+### 下一个DNS？
 
-- DNS filtering is disabled after 300,000 queries per month on the free plan
+- 免费套餐每月进行 300,000 次查询后，DNS 过滤将被禁用
 
-### Cloudflare Gateway?
+### Cloudflare 网关？
 
-- Requires a valid payment card or PayPal account
-- Limit of 300k domains on the free plan
+- 需要有效的支付卡或 PayPal 帐户
+- 免费计划的域名限制为 300k
 
-### a hosts file?
+### 主机文件？
 
-- Potential performance issues, especially on [Windows](https://github.com/StevenBlack/hosts/issues/93)
-- No filter updates
-- Doesn't work for your mobile device
-- No statistics on how many domains you've blocked
+- 潜在的性能问题，尤其是在 [Windows](https://github.com/StevenBlack/hosts/issues/93)
+- 没有过滤器更新
+- 不适用于您的移动设备
+- 没有关于您阻止了多少个域的统计信息
 
-## License
+## 执照
 
-MIT License. See `LICENSE` for more information.
+麻省理工学院（MIT）许可证。有关更多信息，请参阅“许可证”。
