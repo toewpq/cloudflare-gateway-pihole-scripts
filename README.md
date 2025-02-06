@@ -1,7 +1,7 @@
 # Cloudflare 网关 Pi-hole 脚本 (CGPS)
 ![Cloudflare Gateway Analytics screenshot showing a thousand blocked DNS requests](.github/images/gateway_analytics.png)
 
-Cloudflare Gateway allows you to create custom rules to filter HTTP, DNS, and network traffic based on your firewall policies. This is a collection of scripts that can be used to get a similar experience as if you were using Pi-hole, but with Cloudflare Gateway - so no servers to maintain or need to buy a Raspberry Pi!
+Cloudflare Gateway 允许您创建自定义规则，以根据防火墙策略过滤 HTTP、DNS 和网络流量。这是一个脚本集合，可用于获得与使用 Pi-hole 类似的体验，但使用 Cloudflare Gateway - 因此无需维护服务器或需要购买 Raspberry Pi！
 
 ## 关于各个脚本
 
