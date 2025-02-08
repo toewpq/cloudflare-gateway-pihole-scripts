@@ -1,5 +1,4 @@
 name: Update Filter Lists
-
 on:
   schedule:
     - cron: "0 3 * * 1"
